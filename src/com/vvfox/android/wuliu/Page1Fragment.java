@@ -3,6 +3,8 @@ package com.vvfox.android.wuliu;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.vvfox.android.wuliu.core.Client;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -101,21 +103,21 @@ public class Page1Fragment extends Fragment implements OnClickListener,
 		}
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 
-		// FragmentManager fm = getActivity().getSupportFragmentManager();
-		// FragmentTransaction ft = fm.beginTransaction();
-		/*
-		 * if(fm.findFragmentByTag(QUERY_RESULT)==null ){
-		 * ft.add(QueryResultFragment.newInstance(resultMap), QUERY_RESULT); }
-		 */
-		mainActivity.startActivity(new Intent(mainActivity,
-				QueryResultActivity.class));
+		Intent intent = new Intent(mainActivity,
+				QueryResultActivity.class);
+		intent.putExtra("display", json);
+		mainActivity.startActivity(intent);
 
 	}
 
 	private String executeQuery() {
 		// TODO ²éÑ¯ÎïÁ÷
-
-		return null;
+		String nu = wuliuNumberEditText.getText().toString();
+		if(zncxCheckBox.isChecked()){
+		return MainActivity.client.smartQuery(nu	);
+		}else{
+			return MainActivity.client.query(nu, "com");
+		}
 	}
 
 	private void choosedZhiNengChaXun() {

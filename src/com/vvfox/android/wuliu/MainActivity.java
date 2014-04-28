@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.vvfox.android.wuliu.core.Client;
+
 import android.app.Activity;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -42,6 +44,7 @@ public class MainActivity extends FragmentActivity {
 	private int offset = 0;// ¶¯»­Í¼Æ¬Æ«ÒÆÁ¿
 	private int currIndex = 0;// µ±Ç°Ò³¿¨±àºÅ
 	private int bmpW;// ¶¯»­Í¼Æ¬¿í¶È
+	static Client client;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -50,6 +53,12 @@ public class MainActivity extends FragmentActivity {
 		InitImageView();
 		InitTextView();
 		InitViewPager();
+		initClient();
+	}
+
+	private void initClient() {
+		// TODO Auto-generated method stub
+		client = Client.getInstance();
 	}
 
 	/**

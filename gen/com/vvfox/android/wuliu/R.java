@@ -28,7 +28,7 @@ public final class R {
     public static final class id {
         public static final int button_query=0x7f070010;
         public static final int button_query_back=0x7f070011;
-        public static final int button_query_back_in_fragment=0x7f070012;
+        public static final int button_query_back_in_fragment=0x7f070014;
         public static final int checkBoxZncx=0x7f070009;
         public static final int choseArea=0x7f07000a;
         public static final int cursor=0x7f070006;
@@ -44,7 +44,9 @@ public final class R {
         public static final int text1=0x7f070003;
         public static final int text2=0x7f070004;
         public static final int text3=0x7f070005;
+        public static final int textView1=0x7f070013;
         public static final int vPager=0x7f070007;
+        public static final int webView1=0x7f070012;
     }
     public static final class layout {
         public static final int fragment_main=0x7f030000;
