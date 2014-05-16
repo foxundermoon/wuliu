@@ -1,6 +1,7 @@
 package com.vvfox.android.wuliu.core;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,8 +19,10 @@ import org.json.JSONObject;
 
 public class Client {
 	static boolean hasInstance = false;
+	static String wuliuApi = "http://localhost/wuliu/api/wuliu.php";
+//	static String wuliuApi = "http://wuliu.vvfox.com/api/wuliu.php";
 	static Client instance;
-
+	public User user;
 	HttpClient hc;
 	static final String key = "5315025d63bf35f4";
 	static final String api = "http://api.kuaidi100.com/api";
@@ -30,9 +33,65 @@ public class Client {
 	private Client() {
 		param = new HashMap<String, Object>();
 		hc = new DefaultHttpClient();
+		user = new User();
+	}
+	
+	public boolean login(User user){
+		this.user = user;
+		return login();
+	}
+
+	public boolean login() {
+		// TODO Auto-generated method stub
+		Map<String,String> params = new HashMap<String,String>();
+		params.put("op", "");
+		
+		JSONObject jo;
+		try {
+			jo = new JSONObject(doGet(wuliuApi,params,"utf-8"));
+			if("loginok"==getMsgFromJSON(jo)){
+				user.setUserid(jo.getString("userid"));
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		return false;
+	}
+	
+	public void insertRecorde(Map<String,String> param){
+		doGet(wuliuApi,param,"utf-8");
+		
+	}
+	
+	public String getMsgFromJSON(String jsonStr){
+		JSONObject jo;
+		try {
+			jo = new JSONObject(jsonStr);
+			return getMsgFromJSON(jo);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+
+	public String getMsgFromJSON(JSONObject jo) {
+		// TODO Auto-generated method stub
+		try {
+			return jo.getString("message");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public String query(String nu, String com) {
+		return html5result(nu, com);
+		/**
 		param.put("id", key); // api key
 		param.put("com", com); // 快递公司编号
 		param.put("nu", nu);// 快递单
@@ -41,6 +100,8 @@ public class Client {
 		// HttpGet get = new HttpGet();
 		// HttpParams param1 = new HttpParams();
 		return doGet(api, param, defaultCharset);
+		
+		*/
 
 	}
 
@@ -82,10 +143,10 @@ public class Client {
 				+ nu;
 	}
 
-	private String doGet(String url, Map<String, Object> param2, String charset) {
+	private String doGet(String url, Map<String, String> param2, String charset) {
 		// TODO Auto-generated method stub
 		StringBuilder sb = new StringBuilder();
-		for (Map.Entry<String, Object> entry : param2.entrySet()) {
+		for (Map.Entry<String, String> entry : param2.entrySet()) {
 			// key =value
 			sb.append("&");
 			sb.append(entry.getKey()).append("=")

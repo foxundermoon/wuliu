@@ -18,35 +18,33 @@ public final class R {
          would include 7" and 10" devices in landscape (~960dp and ~1280dp respectively).
     
          */
-        public static final int activity_horizontal_margin=0x7f040000;
-        public static final int activity_vertical_margin=0x7f040001;
+        public static final int activity_horizontal_margin=0x7f050000;
+        public static final int activity_vertical_margin=0x7f050001;
     }
     public static final class drawable {
         public static final int a=0x7f020000;
-        public static final int ic_launcher=0x7f020001;
+        public static final int about=0x7f020001;
+        public static final int ic_launcher=0x7f020002;
     }
     public static final class id {
-        public static final int button_query=0x7f070010;
-        public static final int button_query_back=0x7f070011;
-        public static final int button_query_back_in_fragment=0x7f070014;
-        public static final int checkBoxZncx=0x7f070009;
-        public static final int choseArea=0x7f07000a;
-        public static final int cursor=0x7f070006;
-        public static final int editTextNumber=0x7f07000f;
-        public static final int linearLayout1=0x7f070002;
-        public static final int page1_root=0x7f070008;
-        public static final int radio0=0x7f07000c;
-        public static final int radio1=0x7f07000d;
-        public static final int radio2=0x7f07000e;
-        public static final int radioGroup1=0x7f07000b;
-        public static final int root=0x7f070001;
-        public static final int section_label=0x7f070000;
-        public static final int text1=0x7f070003;
-        public static final int text2=0x7f070004;
-        public static final int text3=0x7f070005;
-        public static final int textView1=0x7f070013;
-        public static final int vPager=0x7f070007;
-        public static final int webView1=0x7f070012;
+        public static final int button_query001=0x7f08000b;
+        public static final int button_query_back=0x7f08000e;
+        public static final int button_query_back_in_fragment=0x7f080011;
+        public static final int checkBoxZncx=0x7f080009;
+        public static final int choseArea=0x7f08000c;
+        public static final int cursor=0x7f080006;
+        public static final int editTextNumber=0x7f08000a;
+        public static final int linearLayout1=0x7f080002;
+        public static final int page1_root=0x7f080008;
+        public static final int radioGroup1=0x7f08000d;
+        public static final int root=0x7f080001;
+        public static final int section_label=0x7f080000;
+        public static final int text1=0x7f080003;
+        public static final int text2=0x7f080004;
+        public static final int text3=0x7f080005;
+        public static final int textView1=0x7f080010;
+        public static final int vPager=0x7f080007;
+        public static final int webView1=0x7f08000f;
     }
     public static final class layout {
         public static final int fragment_main=0x7f030000;
@@ -57,13 +55,16 @@ public final class R {
         public static final int query_result=0x7f030005;
         public static final int query_result_fragment=0x7f030006;
     }
+    public static final class raw {
+        public static final int wuliu_gongsi=0x7f040000;
+    }
     public static final class string {
-        public static final int action_settings=0x7f050005;
-        public static final int app_name=0x7f050000;
-        public static final int title_activity_main=0x7f050001;
-        public static final int title_section1=0x7f050002;
-        public static final int title_section2=0x7f050003;
-        public static final int title_section3=0x7f050004;
+        public static final int action_settings=0x7f060005;
+        public static final int app_name=0x7f060000;
+        public static final int title_activity_main=0x7f060001;
+        public static final int title_section1=0x7f060002;
+        public static final int title_section2=0x7f060003;
+        public static final int title_section3=0x7f060004;
     }
     public static final class style {
         /** 
@@ -87,10 +88,10 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f060000;
+        public static final int AppBaseTheme=0x7f070000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f060001;
+        public static final int AppTheme=0x7f070001;
     }
 }

@@ -1,17 +1,19 @@
 package com.vvfox.android.wuliu;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.vvfox.android.wuliu.core.Client;
+import org.apache.http.util.EncodingUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +24,9 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class Page1Fragment extends Fragment implements OnClickListener,
@@ -34,6 +39,8 @@ public class Page1Fragment extends Fragment implements OnClickListener,
 	private EditText wuliuNumberEditText;
 	private ViewGroup container;
 	private Activity mainActivity;
+	private RadioGroup radioGroup;
+	private View currentView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -45,8 +52,9 @@ public class Page1Fragment extends Fragment implements OnClickListener,
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.page_1, container, false);
-		initView(view);
+		currentView = view;
 		this.container = container;
+		initView(view);
 		return view;
 	}
 
@@ -69,12 +77,54 @@ public class Page1Fragment extends Fragment implements OnClickListener,
 
 	private void initView(View view) {
 		// TODO Auto-generated method stub
-		queryBtn = (Button) view.findViewById(R.id.button_query);
+		queryBtn = (Button) view.findViewById(R.id.button_query001);
 		queryBtn.setOnClickListener(this);
 		zncxCheckBox = (CheckBox) view.findViewById(R.id.checkBoxZncx);
 		zncxCheckBox.setOnCheckedChangeListener(this);
 		choseArea = (FrameLayout) view.findViewById(R.id.choseArea);
 		wuliuNumberEditText = (EditText) view.findViewById(R.id.editTextNumber);
+		radioGroup =  (RadioGroup) view.findViewById(R.id.radioGroup1);
+		initRadiobox(view);
+	}
+
+	private void initRadiobox(View view) {
+		// TODO Auto-generated method stub
+		radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				// TODO Auto-generated method stub
+				RadioButton checkedRb = (RadioButton)group.findViewById(checkedId);
+				wuliuNumberEditText.setHint("请输入"+checkedRb.getText()+"的物流运单号");
+			}
+			
+		});
+		InputStream is = view.getContext().getResources()
+				.openRawResource(R.raw.wuliu_gongsi);
+		byte[] buf;
+		try {
+			buf = new byte[is.available()];
+			is.read(buf);
+			String config = EncodingUtils.getString(buf, "GBK");
+			JSONArray ja= new JSONObject(config).getJSONArray("gongsis");
+			for(int i=0;i<ja.length();i++){
+				JSONObject jo = (JSONObject) ja.get(i);
+				RadioButton rb = new RadioButton(view.getContext());
+				rb.setText(jo.getString("name"));
+				rb.setTag(jo.getString("com"));
+				radioGroup.addView(rb);
+				
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	@Override
@@ -103,8 +153,7 @@ public class Page1Fragment extends Fragment implements OnClickListener,
 		}
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 
-		Intent intent = new Intent(mainActivity,
-				QueryResultActivity.class);
+		Intent intent = new Intent(mainActivity, QueryResultActivity.class);
 		intent.putExtra("display", json);
 		mainActivity.startActivity(intent);
 
@@ -113,16 +162,18 @@ public class Page1Fragment extends Fragment implements OnClickListener,
 	private String executeQuery() {
 		// TODO 查询物流
 		String nu = wuliuNumberEditText.getText().toString();
-		if(zncxCheckBox.isChecked()){
-		return MainActivity.client.smartQuery(nu	);
-		}else{
-			return MainActivity.client.query(nu, "com");
+		if (zncxCheckBox.isChecked()) {
+			return MainActivity.client.smartQuery(nu);
+		} else {
+			RadioButton rb = (RadioButton) currentView.findViewById(radioGroup.getCheckedRadioButtonId());
+			return MainActivity.client.query(nu, rb.getTag().toString());
 		}
 	}
 
 	private void choosedZhiNengChaXun() {
 		// TODO 选择了智能查询
 		// 隐藏物流选择区域
+		wuliuNumberEditText.setHint("你选择了智能模式，只需输入快递运单号就可以！");
 		choseArea.setVisibility(View.GONE);
 
 	}
@@ -130,7 +181,7 @@ public class Page1Fragment extends Fragment implements OnClickListener,
 	private void unchoosedZhiNengChaXun() {
 		// TODO 取消选择智能查询
 		// 显示物流选择区域
-		choseArea.setVisibility(View.INVISIBLE);
+		choseArea.setVisibility(View.VISIBLE);
 
 	}
 

@@ -1,0 +1,56 @@
+{
+    "gongsis": [
+        {
+            "com": "bangsongwuliu",
+            "name": "邦送物流"
+        },
+        {
+            "com": "ems",
+            "name": "EMS"
+        },
+        {
+            "com": "feikangda",
+            "name": "飞康达物流"
+        },
+        {
+            "com": "rufengda",
+            "name": "凡客如风达"
+        },
+        {
+            "com": "guotongkuaidi",
+            "name": "国通快递"
+        },
+        {
+            "com": "huitongkuaidi",
+            "name": "汇通快运"
+        },
+        {
+            "com": "longbanwuliu",
+            "name": "龙邦物流"
+        },
+        {
+            "com": "tiantian",
+            "name": "天天快递"
+        },
+        {
+            "com": "yuantong",
+            "name": "圆通速递"
+        },
+        {
+            "com": "yunda",
+            "name": "韵达快运"
+        },
+        {
+            "com": "zhaijisong",
+            "name": "宅急送"
+        },
+        {
+            "com": "zhimakaimen",
+            "name": "芝麻开门"
+        },
+        {
+            "com": "zhongtianwanyun",
+            "name": "中天万运"
+        }
+    ]
+}
