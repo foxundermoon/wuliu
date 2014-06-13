@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.vvfox.android.wuliu.core.Client;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -83,22 +85,25 @@ public class Page1Fragment extends Fragment implements OnClickListener,
 		zncxCheckBox.setOnCheckedChangeListener(this);
 		choseArea = (FrameLayout) view.findViewById(R.id.choseArea);
 		wuliuNumberEditText = (EditText) view.findViewById(R.id.editTextNumber);
-		radioGroup =  (RadioGroup) view.findViewById(R.id.radioGroup1);
+		radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup1);
 		initRadiobox(view);
 	}
 
 	private void initRadiobox(View view) {
 		// TODO Auto-generated method stub
-		radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-			
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				// TODO Auto-generated method stub
-				RadioButton checkedRb = (RadioButton)group.findViewById(checkedId);
-				wuliuNumberEditText.setHint("请输入"+checkedRb.getText()+"的物流运单号");
-			}
-			
-		});
+		radioGroup
+				.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+
+					@Override
+					public void onCheckedChanged(RadioGroup group, int checkedId) {
+						// TODO Auto-generated method stub
+						RadioButton checkedRb = (RadioButton) group
+								.findViewById(checkedId);
+						wuliuNumberEditText.setHint("请输入" + checkedRb.getText()
+								+ "的物流运单号");
+					}
+
+				});
 		InputStream is = view.getContext().getResources()
 				.openRawResource(R.raw.wuliu_gongsi);
 		byte[] buf;
@@ -106,19 +111,18 @@ public class Page1Fragment extends Fragment implements OnClickListener,
 			buf = new byte[is.available()];
 			is.read(buf);
 			String config = EncodingUtils.getString(buf, "GBK");
-			JSONArray ja= new JSONObject(config).getJSONArray("gongsis");
-			for(int i=0;i<ja.length();i++){
+			JSONArray ja = new JSONObject(config).getJSONArray("gongsis");
+			for (int i = 0; i < ja.length(); i++) {
 				JSONObject jo = (JSONObject) ja.get(i);
 				RadioButton rb = new RadioButton(view.getContext());
 				rb.setText(jo.getString("name"));
 				rb.setTag(jo.getString("com"));
 				radioGroup.addView(rb);
-				
+
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -162,11 +166,40 @@ public class Page1Fragment extends Fragment implements OnClickListener,
 	private String executeQuery() {
 		// TODO 查询物流
 		String nu = wuliuNumberEditText.getText().toString();
+		Map<String, String> recorde = new HashMap<String, String>();
+		recorde.put("op", "record");
+		recorde.put("userid", Client.getInstance().user.getUserid());
+		String content = "";
+		JSONObject jo = new JSONObject();
 		if (zncxCheckBox.isChecked()) {
+			try {
+				jo.put("type", "0");
+				jo.put("nu", nu);
+				content = jo.toString();
+				recorde.put("content", content);
+				// MainActivity.client.insertRecorde(recorde);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			return MainActivity.client.smartQuery(nu);
 		} else {
-			RadioButton rb = (RadioButton) currentView.findViewById(radioGroup.getCheckedRadioButtonId());
-			return MainActivity.client.query(nu, rb.getTag().toString());
+			RadioButton rb = (RadioButton) currentView.findViewById(radioGroup
+					.getCheckedRadioButtonId());
+			String com = rb.getTag().toString();
+			try {
+				jo.put("type", "1");
+				jo.put("nu", nu);
+				jo.put("com", com);
+				content = jo.toString();
+				recorde.put("content", content);
+				// MainActivity.client.insertRecorde(recorde);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return MainActivity.client.query(nu, com);
 		}
 	}
 

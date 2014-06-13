@@ -40,11 +40,11 @@ public class QueryResultActivity extends Activity {
 		if (result == null || "".equals(result)) {
 			webView.loadData("somthing wrong!", "text/html", "utf-8");
 		} else {
-//			webView.loadData(result, "text/html", "utf-8");
-			TextView t1 = (TextView)findViewById(R.id.textView1);
+			// webView.loadData(result, "text/html", "utf-8");
+			TextView t1 = (TextView) findViewById(R.id.textView1);
 			t1.setText(result);
 			webView.loadUrl(result);
-			
+
 		}
 	}
 

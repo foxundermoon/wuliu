@@ -1,7 +1,6 @@
 package com.vvfox.android.wuliu.core;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,17 +9,18 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 public class Client {
+	static boolean isLogined = false;
 	static boolean hasInstance = false;
 	static String wuliuApi = "http://localhost/wuliu/api/wuliu.php";
-//	static String wuliuApi = "http://wuliu.vvfox.com/api/wuliu.php";
+	// static String wuliuApi = "http://wuliu.vvfox.com/api/wuliu.php";
 	static Client instance;
 	public User user;
 	HttpClient hc;
@@ -29,43 +29,89 @@ public class Client {
 	static String autoNuApi = "http://www.kuaidi100.com/autonumber/auto?num=";
 	Map<String, Object> param;
 	private String defaultCharset = "utf-8";
+	private JSONArray jsonRecord;
 
 	private Client() {
 		param = new HashMap<String, Object>();
 		hc = new DefaultHttpClient();
 		user = new User();
 	}
-	
-	public boolean login(User user){
+
+	public boolean login(User user) {
 		this.user = user;
 		return login();
 	}
 
-	public boolean login() {
-		// TODO Auto-generated method stub
-		Map<String,String> params = new HashMap<String,String>();
-		params.put("op", "");
-		
+	public boolean register(User user) {
+		this.user = user;
+		return register();
+	}
+
+	public boolean register() {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("op", "reg");
+		params.put("mail", user.getMail());
+		params.put("password", user.getPassword());
+		params.put("name", user.getName());
 		JSONObject jo;
 		try {
-			jo = new JSONObject(doGet(wuliuApi,params,"utf-8"));
-			if("loginok"==getMsgFromJSON(jo)){
-				user.setUserid(jo.getString("userid"));
+			String body = doGet(wuliuApi, params);
+			Log.v("vvfox", body);
+			jo = new JSONObject(body);
+			String msg = jo.getString("message");
+			if ("regok".equals(msg)) {
+				return true;
+			} else {
+				return false;
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
+
 		return false;
 	}
-	
-	public void insertRecorde(Map<String,String> param){
-		doGet(wuliuApi,param,"utf-8");
-		
+
+	public boolean login() {
+		// TODO Auto-generated method stub
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("op", "login");
+		params.put("mail", user.getMail());
+		params.put("password", user.getPassword());
+
+		JSONArray ja;
+		try {
+			String body = doGet(wuliuApi, params);
+			Log.v("vvfox", "response body:" + body);
+			ja = new JSONArray(doGet(wuliuApi, params));
+			JSONObject juser = ja.optJSONObject(0);
+			if (juser != null) {
+				String uid = juser.optString("id");
+				if (uid == null || "".equals(uid)) {
+					return false;
+				} else {
+					user.setUserid(uid);
+					user.setMail(juser.optString("mail"));
+					isLogined = true;
+					return true;
+				}
+			} else {
+				Log.v("vvfox", "cant opt juser");
+				return false;
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
 	}
-	
-	public String getMsgFromJSON(String jsonStr){
+
+	public void insertRecorde(Map<String, String> param) {
+		doGet(wuliuApi, param);
+
+	}
+
+	public String getMsgFromJSON(String jsonStr) {
 		JSONObject jo;
 		try {
 			jo = new JSONObject(jsonStr);
@@ -75,7 +121,7 @@ public class Client {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 	}
 
 	public String getMsgFromJSON(JSONObject jo) {
@@ -89,19 +135,44 @@ public class Client {
 		}
 	}
 
+	public JSONArray getJsonRecorde(Map<String, String> params) {
+		String body = doGet(wuliuApi, params);
+		Log.v("record", body);
+		if(body==null || "null".equals(body) || "".equals(body)){
+			Log.v("record","get recorde is null");
+			return null;
+		}else{
+		try {
+			
+			jsonRecord = new JSONArray(body);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+		}
+	}
+
+	public JSONArray getJsonRecord() {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("op", "history");
+		params.put("userid", user.getUserid());
+		return getJsonRecorde(params);
+	}
+
+	public void setJsonRecord(JSONArray jsonRecorde) {
+		this.jsonRecord = jsonRecorde;
+	}
+
 	public String query(String nu, String com) {
 		return html5result(nu, com);
 		/**
-		param.put("id", key); // api key
-		param.put("com", com); // 快递公司编号
-		param.put("nu", nu);// 快递单
-		param.put("show", "2");// 返回类型 0：json，1：xml，2：html，3：text
-		param.put("mutil", "1"); // 1：多行完整信息
-		// HttpGet get = new HttpGet();
-		// HttpParams param1 = new HttpParams();
-		return doGet(api, param, defaultCharset);
-		
-		*/
+		 * param.put("id", key); // api key param.put("com", com); // 快递公司编号
+		 * param.put("nu", nu);// 快递单 param.put("show", "2");// 返回类型
+		 * 0：json，1：xml，2：html，3：text param.put("mutil", "1"); // 1：多行完整信息 //
+		 * HttpGet get = new HttpGet(); // HttpParams param1 = new HttpParams();
+		 * return doGet(api, param, defaultCharset);
+		 */
 
 	}
 
@@ -179,7 +250,25 @@ public class Client {
 		}
 	}
 
+	private String doGet(String url, Map<String, String> param2) {
+		StringBuilder sb = new StringBuilder();
+		for (Map.Entry<String, String> entry : param2.entrySet()) {
+			// key =value
+			sb.append("&");
+			sb.append(entry.getKey()).append("=")
+					.append((String) entry.getValue());
+
+		}
+		String fullUrl = url + sb.toString().replaceFirst("&", "?");
+
+		return doGet(fullUrl);
+	}
+
 	private String doGet(String url) {
+
+		url = url.replace("localhost", "10.0.2.2").replace("127.0.0.1",
+				"10.0.2.2");
+		Log.v("vvfox", url);
 		HttpGet rst = new HttpGet(url);
 		try {
 			HttpResponse rsp = hc.execute(rst);
@@ -191,12 +280,13 @@ public class Client {
 			}
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return "ClientProtocolException:" + e.getMessage() + "stackTrace:"
+					+ e.getStackTrace().toString();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return "IOException:" + e.getStackTrace().toString() + "message:"
+					+ e.getMessage();
 		}
-		return "some thing wrong!";
 	}
 
 	public static Client getInstance() {
@@ -210,5 +300,9 @@ public class Client {
 		} else {
 			return new Client();
 		}
+	}
+
+	public static boolean isLogined() {
+		return isLogined;
 	}
 }

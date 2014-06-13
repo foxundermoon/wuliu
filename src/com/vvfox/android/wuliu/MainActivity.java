@@ -1,32 +1,26 @@
 package com.vvfox.android.wuliu;
 
-import java.util.HashMap;
-import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import com.vvfox.android.wuliu.core.Client;
-
-import android.app.Activity;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.vvfox.android.wuliu.core.Client;
 
 /**
  * Tab页面手势滑动切换以及动画效果
@@ -34,9 +28,10 @@ import android.widget.TextView;
  * @author D.Winter
  * 
  */
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements OnLoginedListener {
 	// ViewPager是google SDk中自带的一个附加包的一个类，可以用来实现屏幕间的切换。
 	// android-support-v4.jar
+	public static MainActivity instance;
 	private ViewPager mPager;// 页卡内容
 	private List<Fragment> listFragments; // Tab页面列表
 	private ImageView cursor;// 动画图片
@@ -44,6 +39,8 @@ public class MainActivity extends FragmentActivity {
 	private int offset = 0;// 动画图片偏移量
 	private int currIndex = 0;// 当前页卡编号
 	private int bmpW;// 动画图片宽度
+	private boolean loginedChanged = false;
+	private Fragment page2;
 	static Client client;
 
 	@Override
@@ -54,6 +51,17 @@ public class MainActivity extends FragmentActivity {
 		InitTextView();
 		InitViewPager();
 		initClient();
+		instance = this;
+
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		// if(Client.isLogined()) {
+		// Log.v("vvfox","fromloginactivity:"+savedInstanceState.getBoolean("fromloginactivity"));
+		// onLogined();
+		// }
 	}
 
 	private void initClient() {
@@ -81,7 +89,8 @@ public class MainActivity extends FragmentActivity {
 		mPager = (ViewPager) findViewById(R.id.vPager);
 		listFragments = new ArrayList<Fragment>();
 		listFragments.add(new Page1Fragment());
-		listFragments.add(new Page2Fragment());
+		page2 = new Page2Fragment();
+		listFragments.add(page2);
 		listFragments.add(new Page3Fragment());
 		mPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager(),
 				listFragments));
@@ -109,13 +118,13 @@ public class MainActivity extends FragmentActivity {
 	 * ViewPager适配器
 	 */
 	public class MyPagerAdapter extends FragmentPagerAdapter {
-
 		public List<Fragment> mListFragments;
-
+		private FragmentManager fragmentManager;
 
 		public MyPagerAdapter(FragmentManager fm, List<Fragment> list) {
 			super(fm);
 			this.mListFragments = list;
+			this.fragmentManager = fm;
 		}
 
 		@Override
@@ -128,6 +137,13 @@ public class MainActivity extends FragmentActivity {
 		public int getCount() {
 			// TODO Auto-generated method stub
 			return listFragments.size();
+		}
+
+		public void replace(int index, Fragment fragment) {
+			mListFragments.remove(index);
+			mListFragments.add(index, fragment);
+			mPager.setCurrentItem(index);
+
 		}
 
 	}
@@ -145,6 +161,7 @@ public class MainActivity extends FragmentActivity {
 		@Override
 		public void onClick(View v) {
 			mPager.setCurrentItem(index);
+
 		}
 	};
 
@@ -195,5 +212,34 @@ public class MainActivity extends FragmentActivity {
 		@Override
 		public void onPageScrollStateChanged(int arg0) {
 		}
+	}
+
+	@Override
+	public void onLogined() {
+		// TODO Auto-generated method stub
+		/*
+		 * MyPagerAdapter myPadp =(MyPagerAdapter) mPager.getAdapter();
+		 * myPadp.replace(1,new Page2LoginedFragment());
+		 * myPadp.notifyDataSetChanged();
+		 */
+		loginedChanged = true;
+		Page2Fragment page = (Page2Fragment) page2;
+		page.login();
+		/*
+		 * FragmentManager fm = getSupportFragmentManager(); FragmentTransaction
+		 * transaction = fm.beginTransaction();
+		 * transaction.replace(page2.getId(),new Page2LoginedFragment());
+		 * transaction.commit();
+		 */
+		// findViewById(R.id.linearLayout_in_page_2_logined).setVisibility(
+		// LinearLayout.VISIBLE);
+		// findViewById(R.id.linearLayout_in_page_2_notlogined).setVisibility(
+		// LinearLayout.GONE);
+
+	}
+
+	public boolean loginedChanged() {
+		// TODO Auto-generated method stub
+		return loginedChanged;
 	}
 }
